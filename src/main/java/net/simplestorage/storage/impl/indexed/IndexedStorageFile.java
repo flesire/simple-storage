@@ -1,7 +1,7 @@
 package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
-import net.simplestorage.storage.StringRecordWrapper;
+import net.simplestorage.storage.RecordWrapper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,18 +16,18 @@ public class IndexedStorageFile extends RandomAccessFile {
         super(name, "rw");
     }
 
-    public StringRecordWrapper read(long position, int length) throws StorageException {
+    public RecordWrapper read(long position, int length) throws StorageException {
         final byte[] buffer = new byte[length];
         try {
             this.seek(position);
             this.readFully(buffer);
-            return new StringRecordWrapper(buffer);
+            return new RecordWrapper(buffer);
         } catch (IOException e) {
             throw new StorageException(String.format("Unable to read record at position %d", position));
         }
     }
 
-    public void write(StringRecordWrapper line, long position) throws StorageException {
+    public void write(RecordWrapper line, long position) throws StorageException {
 
         try {
             this.seek(position);
@@ -39,7 +39,7 @@ public class IndexedStorageFile extends RandomAccessFile {
         }
     }
 
-    public void append(StringRecordWrapper line) throws StorageException {
+    public void append(RecordWrapper line) throws StorageException {
         try {
             final byte[] data = line.asByteArray(DEFAULT_CHARSET);
             this.write(data);

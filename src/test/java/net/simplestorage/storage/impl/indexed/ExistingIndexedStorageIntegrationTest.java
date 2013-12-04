@@ -2,10 +2,11 @@ package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Record;
+import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
-import net.simplestorage.storage.StringRecordWrapper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author flesire
  */
+@Ignore
 public class ExistingIndexedStorageIntegrationTest {
 
     private Storage<String, DataRecord> storage;
@@ -84,7 +86,7 @@ public class ExistingIndexedStorageIntegrationTest {
         }
 
         @Override
-        public DataRecord convert(StringRecordWrapper record) {
+        public DataRecord convert(RecordWrapper record) {
             return new DataRecord(record.getString(0), record.getString(1));
         }
     }

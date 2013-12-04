@@ -1,12 +1,16 @@
 package net.simplestorage.storage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.List;
 
-public class StringRecordWrapper {
+public class RecordWrapper {
 
     public static final String DEFAULT_CHARSET = "UTF-8";
 
     public static final String DEFAULT_SEPARATOR = ";";
+
+    public static final String DEFAULT_LIST_SEPARATOR = ",";
 
     private String original = "";
 
@@ -19,14 +23,14 @@ public class StringRecordWrapper {
     /**
      * @param size
      */
-    public StringRecordWrapper(int size) {
+    public RecordWrapper(int size) {
         fields = new String[size];
     }
 
     /**
      * @param record
      */
-    public StringRecordWrapper(String record) {
+    public RecordWrapper(String record) {
         original = record;
         fields = record.split(DEFAULT_SEPARATOR);
     }
@@ -35,7 +39,7 @@ public class StringRecordWrapper {
      * @param record
      * @throws java.io.UnsupportedEncodingException
      */
-    public StringRecordWrapper(byte[] record) throws UnsupportedEncodingException {
+    public RecordWrapper(byte[] record) throws UnsupportedEncodingException {
         original = new String(record, DEFAULT_CHARSET);
         fields = original.split(DEFAULT_SEPARATOR);
     }
@@ -54,6 +58,19 @@ public class StringRecordWrapper {
         fields[index] = String.valueOf(value);
     }
 
+    public void set(List<String> list, int index) {
+        StringBuilder builder = new StringBuilder();
+        int count = 0;
+        for (String string : list) {
+            builder.append(string);
+            if (count < fields.length - 1) {
+                builder.append(DEFAULT_LIST_SEPARATOR);
+            }
+            count++;
+        }
+        fields[index] = builder.toString();
+    }
+
     // Getters
 
     public String getString(int index) {
@@ -66,6 +83,10 @@ public class StringRecordWrapper {
 
     public Boolean getBoolean(int index) {
         return Boolean.valueOf(fields[index]);
+    }
+
+    public List<String> getList(int index) {
+        return Arrays.asList(fields[index].split(DEFAULT_LIST_SEPARATOR));
     }
 
     public String toString() {

@@ -2,8 +2,8 @@ package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Record;
+import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
-import net.simplestorage.storage.StringRecordWrapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -127,7 +127,7 @@ public class NewIndexedStorageIntegrationTest {
         }
 
         @Override
-        public DataRecord convert(StringRecordWrapper record) {
+        public DataRecord convert(RecordWrapper record) {
             return new DataRecord(record.getString(0), record.getString(1));
         }
     }

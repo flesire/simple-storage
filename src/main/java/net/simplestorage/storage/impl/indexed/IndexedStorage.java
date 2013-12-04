@@ -3,8 +3,8 @@ package net.simplestorage.storage.impl.indexed;
 import net.simplestorage.exception.IndexException;
 import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Record;
+import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
-import net.simplestorage.storage.StringRecordWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
             throw new StorageException("Key must be unique. A record already exists with key " + key);
         }
         String convert = convert(record);
-        StringRecordWrapper line = new StringRecordWrapper(convert);
+        RecordWrapper line = new RecordWrapper(convert);
         records.append(line);
         indexes.add(key, convert.length());
         return record;
@@ -95,12 +95,12 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         if (recordSize > previousIndex.getLength()) {
             logger.warn("Updated record size is longer than previous record. The updated record will be save as a new one.");
             cleanCurrentRecord(previousIndex);
-            records.append(new StringRecordWrapper(line));
+            records.append(new RecordWrapper(line));
             indexes.add(key, line.length());
         } else {
             final long offset = previousIndex.getOffset();
             previousIndex = new Index(key, offset, recordSize);
-            records.write(new StringRecordWrapper(line), offset);
+            records.write(new RecordWrapper(line), offset);
             indexes.update(previousIndex);
 
             logger.info("Record with key " + key + " is updated.");
@@ -141,7 +141,7 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
 
     // Abstract methods
 
-    public abstract R convert(StringRecordWrapper record);
+    public abstract R convert(RecordWrapper record);
 
     public abstract String convert(R record);
 
@@ -165,7 +165,7 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         indexes.update(index);
     }
 
-    class StorageFilterIterator implements Iterator<StringRecordWrapper> {
+    class StorageFilterIterator implements Iterator<RecordWrapper> {
 
 
         @Override
@@ -174,7 +174,7 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         }
 
         @Override
-        public StringRecordWrapper next() {
+        public RecordWrapper next() {
             return null;
         }
 

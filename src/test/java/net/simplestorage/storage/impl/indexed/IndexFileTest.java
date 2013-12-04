@@ -1,5 +1,6 @@
 package net.simplestorage.storage.impl.indexed;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class IndexFileTest {
 
     @Test

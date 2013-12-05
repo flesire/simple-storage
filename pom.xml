@@ -39,7 +39,7 @@
     </dependencies>
 
     <build>
-        <finalName>filestorage-${project.version}</finalName>
+        <finalName>simplestorage-${project.version}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

@@ -1,37 +1,44 @@
 package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
-import net.simplestorage.storage.RecordWrapper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class IndexedStorageFile extends RandomAccessFile {
 
-    public static final String DEFAULT_CHARSET = "UTF-8";
+    private static final String DEFAULT_CHARSET = "UTF-8";
+
+    private String charSet = DEFAULT_CHARSET;
 
     public IndexedStorageFile(String name) throws FileNotFoundException {
         super(name, "rw");
     }
 
-    public RecordWrapper read(long position, int length) throws StorageException {
+    public IndexedStorageFile(String name, String charSet) throws FileNotFoundException {
+        super(name, "rw");
+        this.charSet = charSet;
+    }
+
+    public String read(long position, int length) throws StorageException {
         final byte[] buffer = new byte[length];
         try {
             this.seek(position);
             this.readFully(buffer);
-            return new RecordWrapper(buffer);
+            return new String(buffer);
         } catch (IOException e) {
             throw new StorageException(String.format("Unable to read record at position %d", position));
         }
     }
 
-    public void write(RecordWrapper line, long position) throws StorageException {
+    public void write(String line, long position) throws StorageException {
 
         try {
             this.seek(position);
-            final byte[] data = line.asByteArray(DEFAULT_CHARSET);
+            final byte[] data = asByteArray(DEFAULT_CHARSET);
             this.seek(position);
             this.write(data);
         } catch (IOException e) {
@@ -39,9 +46,9 @@ public class IndexedStorageFile extends RandomAccessFile {
         }
     }
 
-    public void append(RecordWrapper line) throws StorageException {
+    public void append(String line) throws StorageException {
         try {
-            final byte[] data = line.asByteArray(DEFAULT_CHARSET);
+            final byte[] data = asByteArray(DEFAULT_CHARSET);
             this.write(data);
         } catch (IOException e) {
             throw StorageException.INSERT_FAILED;
@@ -58,6 +65,10 @@ public class IndexedStorageFile extends RandomAccessFile {
         } catch (IOException e) {
             throw new StorageException(e.getMessage());
         }
+    }
+
+    private byte[] asByteArray(String charSet) throws UnsupportedEncodingException {
+        return this.toString().getBytes(charSet);
     }
 
 }

@@ -1,9 +1,9 @@
 package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
-import net.simplestorage.storage.Record;
-import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
+import net.simplestorage.storage.test.util.DataRecord;
+import net.simplestorage.storage.test.util.JsonDataRecordMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +16,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-/**
- * @author flesire
- */
 public class NewIndexedStorageIntegrationTest {
 
     private Logger logger = LoggerFactory.getLogger(NewIndexedStorageIntegrationTest.class);
@@ -29,7 +26,7 @@ public class NewIndexedStorageIntegrationTest {
     @Before
     public void setUp() throws Exception {
         testFile = File.createTempFile("data", "txt");
-        storage = new DataStorage(testFile.getAbsolutePath());
+        storage = new IndexedStorage<String, DataRecord>(testFile.getAbsolutePath(), new JsonDataRecordMapper());
 
     }
 
@@ -92,44 +89,6 @@ public class NewIndexedStorageIntegrationTest {
             storage.close();
         }
 
-    }
-
-    class DataRecord implements Record<String> {
-
-        private String key;
-        private String data;
-
-        public DataRecord(String key, String data) {
-            this.key = key;
-            this.data = data;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        @Override
-        public String getKey() {
-            return key;
-        }
-    }
-
-    class DataStorage extends IndexedStorage<String, DataRecord> {
-
-        public DataStorage(String filename) {
-            super(filename);
-        }
-
-        public String convert(DataRecord record) {
-            StringBuilder buffer = new StringBuilder();
-            buffer.append(record.getKey()).append(";").append(record.getData());
-            return buffer.toString();
-        }
-
-        @Override
-        public DataRecord convert(RecordWrapper record) {
-            return new DataRecord(record.getString(0), record.getString(1));
-        }
     }
 
 }

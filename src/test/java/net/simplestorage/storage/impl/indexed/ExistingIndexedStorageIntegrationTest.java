@@ -1,9 +1,9 @@
 package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
-import net.simplestorage.storage.Record;
-import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
+import net.simplestorage.storage.test.util.CSVDataRecordMapper;
+import net.simplestorage.storage.test.util.DataRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -27,7 +27,7 @@ public class ExistingIndexedStorageIntegrationTest {
     @Before
     public void setUp() throws Exception {
         File testFile = new File(ExistingIndexedStorageIntegrationTest.class.getResource("test.txt").toURI());
-        storage = new DataStorage(testFile.getAbsolutePath());
+        storage = new IndexedStorage<String, DataRecord>(testFile.getAbsolutePath(), new CSVDataRecordMapper());
         storage.open();
     }
 
@@ -51,44 +51,6 @@ public class ExistingIndexedStorageIntegrationTest {
     public void getUnknownRecord() throws StorageException {
         DataRecord record = storage.get("key4");
         assertNull(record);
-    }
-
-    class DataRecord implements Record<String> {
-
-        private String key;
-        private String data;
-
-        public DataRecord(String key, String data) {
-            this.key = key;
-            this.data = data;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        @Override
-        public String getKey() {
-            return key;
-        }
-    }
-
-    class DataStorage extends IndexedStorage<String, DataRecord> {
-
-        public DataStorage(String filename) {
-            super(filename);
-        }
-
-        public String convert(DataRecord record) {
-            StringBuffer buffer = new StringBuffer();
-            buffer.append(record.getKey()).append(";").append(record.getData());
-            return buffer.toString();
-        }
-
-        @Override
-        public DataRecord convert(RecordWrapper record) {
-            return new DataRecord(record.getString(0), record.getString(1));
-        }
     }
 
 }

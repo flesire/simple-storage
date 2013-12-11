@@ -5,6 +5,7 @@ import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Record;
 import net.simplestorage.storage.RecordWrapper;
 import net.simplestorage.storage.Storage;
+import net.simplestorage.storage.mapper.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
-public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
+public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
 
     private Logger logger = LoggerFactory.getLogger(IndexedStorage.class);
     /**
@@ -28,14 +29,19 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
      */
     private IndexedStorageFile records;
 
+    private RecordMapper<R> recordMapper;
+
     /**
      * Default constructor.
      *
      * @param filename The file name for both storage and index files.
+     * @param recordMapper
+     *
      */
-    public IndexedStorage(final String filename) {
+    public IndexedStorage(final String filename, RecordMapper<R> recordMapper) {
         this.filename = filename;
         this.indexes = new IndexFile<K>(filename);
+        this.recordMapper = recordMapper;
     }
 
     @Override
@@ -74,10 +80,9 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         if (indexes.get(key) != null) {
             throw new StorageException("Key must be unique. A record already exists with key " + key);
         }
-        String convert = convert(record);
-        RecordWrapper line = new RecordWrapper(convert);
+        String line = recordMapper.map(record);
         records.append(line);
-        indexes.add(key, convert.length());
+        indexes.add(key, line.length());
         return record;
 
     }
@@ -90,17 +95,17 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         }
         K key = record.getKey();
         Index previousIndex = indexes.get(key);
-        String line = convert(record);
+        String line = recordMapper.map(record);
         final int recordSize = line.length();
         if (recordSize > previousIndex.getLength()) {
             logger.warn("Updated record size is longer than previous record. The updated record will be save as a new one.");
             cleanCurrentRecord(previousIndex);
-            records.append(new RecordWrapper(line));
+            records.append(line);
             indexes.add(key, line.length());
         } else {
             final long offset = previousIndex.getOffset();
             previousIndex = new Index(key, offset, recordSize);
-            records.write(new RecordWrapper(line), offset);
+            records.write(line, offset);
             indexes.update(previousIndex);
 
             logger.info("Record with key " + key + " is updated.");
@@ -139,12 +144,6 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
         }
     }
 
-    // Abstract methods
-
-    public abstract R convert(RecordWrapper record);
-
-    public abstract String convert(R record);
-
     //
 
     /**
@@ -155,7 +154,8 @@ public abstract class IndexedStorage<K, R extends Record<K>> implements Storage<
      * @throws StorageException
      */
     private R readRecord(final Index index) throws StorageException {
-        return convert(records.read(index.getOffset(), index.getLength()));
+        String record = records.read(index.getOffset(), index.getLength());
+        return recordMapper.map(record);
     }
 
     private void cleanCurrentRecord(final Index index) throws StorageException {

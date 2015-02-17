@@ -2,6 +2,7 @@ package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Storage;
+import net.simplestorage.storage.test.util.CSVDataRecordMapper;
 import net.simplestorage.storage.test.util.DataRecord;
 import net.simplestorage.storage.test.util.JsonDataRecordMapper;
 import org.junit.After;
@@ -26,7 +27,7 @@ public class NewIndexedStorageIntegrationTest {
     @Before
     public void setUp() throws Exception {
         testFile = File.createTempFile("data", "txt");
-        storage = new IndexedStorage<String, DataRecord>(testFile.getAbsolutePath(), new JsonDataRecordMapper());
+        storage = new IndexedStorage<String, DataRecord>(testFile.getAbsolutePath(), new CSVDataRecordMapper());
 
     }
 

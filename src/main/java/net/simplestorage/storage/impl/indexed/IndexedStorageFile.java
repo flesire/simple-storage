@@ -30,7 +30,8 @@ public class IndexedStorageFile extends RandomAccessFile {
             this.readFully(buffer);
             return new String(buffer);
         } catch (IOException e) {
-            throw new StorageException(String.format("Unable to read record at position %d", position));
+            e.printStackTrace();
+            throw new StorageException(String.format("Unable to read record at position %d (%s)", position, e.getMessage()));
         }
     }
 
@@ -41,7 +42,6 @@ public class IndexedStorageFile extends RandomAccessFile {
             final byte[] data = asByteArray(line, DEFAULT_CHARSET);
             this.seek(position);
             this.write(data);
-            //this.writeChars(line);
         } catch (IOException e) {
             throw StorageException.INSERT_FAILED;
         }

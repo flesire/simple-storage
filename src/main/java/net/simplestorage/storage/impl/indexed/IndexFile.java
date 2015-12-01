@@ -80,7 +80,7 @@ public class IndexFile<K> {
 
         Index<K> i = new Index<>(key, offset, recordLength);
         indexes.put(key, i);
-        logger.debug(String.format("Add index : %s, offset: %d, size: %d", key, offset, recordLength));
+        logger.info(String.format("Add index : %s, offset: %d, size: %d", key, offset, recordLength));
         lastIndex = i;
         return lastIndex;
     }

@@ -83,8 +83,8 @@ public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
         String line = recordMapper.map(record);
         records.append(line);
         indexes.add(key, line.length());
+        logger.info("Record with key " + key + " is added.");
         return record;
-
     }
 
     @Override
@@ -99,9 +99,10 @@ public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
         final int recordSize = line.length();
         if (recordSize > previousIndex.getLength()) {
             logger.warn("Updated record size is longer than previous record. The updated record will be save as a new one.");
+            logger.debug("Size before " + previousIndex.getLength() + " , size after " + recordSize);
             cleanCurrentRecord(previousIndex);
             records.append(line);
-            indexes.add(key, line.length());
+            indexes.add(key, recordSize);
         } else {
             final long offset = previousIndex.getOffset();
             previousIndex = new Index(key, offset, recordSize);
@@ -118,6 +119,7 @@ public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
             return;
         }
         indexes.remove(key);
+        logger.info("Record with key " + key + " is deleted.");
     }
 
     @Override

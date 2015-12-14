@@ -1,6 +1,7 @@
 package net.simplestorage.storage.impl.indexed;
 
 public class Index<K> {
+
     public static final String FIELD_SEPARATOR = ";";
     /**
      * The key that identify the record

@@ -65,6 +65,7 @@ public class NewIndexedStorageIntegrationTest {
         storage.update(new DataRecord("key1", "data1112"));
         DataRecord updated = storage.get("key1");
         assertEquals("data1112", updated.getData());
+        assertThat(storage.size(), is(1L));
         storage.close();
     }
 

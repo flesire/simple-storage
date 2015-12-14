@@ -1,6 +1,8 @@
 package net.simplestorage.storage.impl.indexed;
 
 import net.simplestorage.exception.StorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,6 +11,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class IndexedStorageFile extends RandomAccessFile {
+
+    private static final Logger log = LoggerFactory.getLogger(IndexedStorageFile.class);
 
     private static final String DEFAULT_CHARSET = "UTF-8";
 
@@ -38,10 +42,11 @@ public class IndexedStorageFile extends RandomAccessFile {
     public void write(String line, long position) throws StorageException {
 
         try {
-            this.seek(position);
             final byte[] data = asByteArray(line, DEFAULT_CHARSET);
+            log.info("File position before write :" + this.getFilePointer());
             this.seek(position);
             this.write(data);
+            log.info("File position after write :" + this.getFilePointer());
         } catch (IOException e) {
             throw StorageException.INSERT_FAILED;
         }
@@ -50,6 +55,7 @@ public class IndexedStorageFile extends RandomAccessFile {
     public void append(String line) throws StorageException {
         try {
             final byte[] data = asByteArray(line, DEFAULT_CHARSET);
+            log.info("File position :" + this.getFilePointer());
             this.write(data);
         } catch (IOException e) {
             throw StorageException.INSERT_FAILED;

@@ -1,22 +1,35 @@
 package net.simplestorage.storage.impl.indexed;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class IndexedStorageFileTest {
 
     private IndexedStorageFile storageFile;
 
+    private File testFile;
+
     @Before
-    public void setUp() throws URISyntaxException, FileNotFoundException {
-        File testFile = new File(ExistingIndexedStorageIntegrationTest.class.getResource("testIndexFile.txt").toURI());
+    public void setUp() throws URISyntaxException, IOException {
+        testFile = new File(ExistingIndexedStorageIntegrationTest.class.getResource("testIndexFile.txt").toURI());
+        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(testFile));
+        stream.write("test001test002".toString().getBytes("UTF-8"));
+        stream.close();
         storageFile = new IndexedStorageFile(testFile.getAbsolutePath());
+    }
+
+    @After
+    public void tearDown() {
+        testFile.delete();
     }
 
     @Test
@@ -42,10 +55,5 @@ public class IndexedStorageFileTest {
             storageFile.append("test003");
             assertEquals(21,storageFile.length());
             storageFile.clear(14,7);
-    }
-
-    @Test
-    public void testClear() throws Exception {
-
     }
 }

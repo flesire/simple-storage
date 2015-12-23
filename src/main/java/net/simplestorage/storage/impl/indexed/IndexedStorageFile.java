@@ -36,7 +36,6 @@ public class IndexedStorageFile extends RandomAccessFile {
     }
 
     public void write(String line, long position) throws StorageException {
-
         try {
             this.seek(position);
             final byte[] data = asByteArray(line, DEFAULT_CHARSET);
@@ -50,6 +49,8 @@ public class IndexedStorageFile extends RandomAccessFile {
     public void append(String line) throws StorageException {
         try {
             final byte[] data = asByteArray(line, DEFAULT_CHARSET);
+            long length = this.length();
+            this.seek(length);
             this.write(data);
         } catch (IOException e) {
             throw StorageException.INSERT_FAILED;
@@ -68,7 +69,7 @@ public class IndexedStorageFile extends RandomAccessFile {
             }
             this.seek(position);
             this.write(buffer);
-            this.setLength(position);
+            this.seek(this.length());
         } catch (IOException e) {
             throw new StorageException(e.getMessage());
         }

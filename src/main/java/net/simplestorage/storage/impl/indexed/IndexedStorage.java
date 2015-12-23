@@ -94,7 +94,7 @@ public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
             return;
         }
         K key = record.getKey();
-        Index previousIndex = indexes.get(key);
+        Index<K> previousIndex = indexes.get(key);
         String line = recordMapper.map(record);
         final int recordSize = line.length();
         if (recordSize > previousIndex.getLength()) {
@@ -160,11 +160,11 @@ public class IndexedStorage<K, R extends Record<K>> implements Storage<K, R> {
         return recordMapper.map(record);
     }
 
-    private void cleanCurrentRecord(final Index index) throws StorageException {
+    private void cleanCurrentRecord(final Index<K> index) throws StorageException {
         final long offset = index.getOffset();
         final int recordSize = index.getLength();
         records.clear(offset, recordSize);
-        indexes.update(index);
+        indexes.remove(index.getKey());
     }
 
     class StorageFilterIterator implements Iterator<RecordWrapper> {

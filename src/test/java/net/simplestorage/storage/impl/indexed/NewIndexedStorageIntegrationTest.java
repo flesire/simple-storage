@@ -4,7 +4,6 @@ import net.simplestorage.exception.StorageException;
 import net.simplestorage.storage.Storage;
 import net.simplestorage.storage.test.util.CSVDataRecordMapper;
 import net.simplestorage.storage.test.util.DataRecord;
-import net.simplestorage.storage.test.util.JsonDataRecordMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +25,8 @@ public class NewIndexedStorageIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        testFile = File.createTempFile("data", "txt");
+        testFile = File.createTempFile("data", ".txt");
+        logger.info("Test file {} created.", testFile.getAbsolutePath());
         storage = new IndexedStorage<String, DataRecord>(testFile.getAbsolutePath(), new CSVDataRecordMapper());
 
     }
@@ -35,7 +35,9 @@ public class NewIndexedStorageIntegrationTest {
     public void tearDown() {
         boolean result = testFile.delete();
         if (!result) {
-            logger.debug("Cannot delete file : " + testFile.getAbsolutePath());
+            logger.info("Cannot delete file : " + testFile.getAbsolutePath());
+        } else {
+            logger.info("Test file deleted.");
         }
     }
 
@@ -64,7 +66,8 @@ public class NewIndexedStorageIntegrationTest {
         storage.put(new DataRecord("key1", "data1111"));
         storage.update(new DataRecord("key1", "data1112"));
         DataRecord updated = storage.get("key1");
-        assertEquals("data1112", updated.getData());
+        String data = updated.getData();
+        assertEquals("data1112", data);
         storage.close();
     }
 
@@ -72,10 +75,12 @@ public class NewIndexedStorageIntegrationTest {
     public void openNewStorageAndAddUpdateKeyLongerRecord() throws StorageException {
         storage.open();
         storage.put(new DataRecord("key1", "data1111"));
+        storage.put(new DataRecord("key3", "data1113"));
         storage.update(new DataRecord("key1", "data11112"));
+        storage.flush();
         DataRecord updated = storage.get("key1");
         assertEquals("data11112", updated.getData());
-        assertThat(storage.size(), is(1L));
+        assertThat(storage.size(), is(2L));
         storage.close();
     }
 
